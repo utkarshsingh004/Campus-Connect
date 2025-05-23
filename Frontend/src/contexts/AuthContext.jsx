@@ -21,7 +21,7 @@ export function AuthProvider({ children }) {
   // Register function with 3-second auto logout and no localStorage save
   const register = async ({ collageName, email, password }) => {
     try {
-      const response = await axios.post('http://localhost:9000/api/v1/users/register', {
+      const response = await axios.post('https://campus-connect-backend-0u6m.onrender.com/api/v1/users/register', {
         collageName,
         email,
         password,
@@ -55,7 +55,7 @@ export function AuthProvider({ children }) {
     try {
       if (!email || !password) return false;
   
-      const response = await axios.post('http://localhost:9000/api/v1/users/login', {
+      const response = await axios.post('https://campus-connect-backend-0u6m.onrender.com/api/v1/users/login', {
         email,
         password,
       });
