@@ -137,7 +137,7 @@ function CompaniesPage() {
             </div>
             
             <div>
-              <label htmlFor="status-filter" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+              <label htmlFor="status-filter" className="block text-sm font-medium text-neutral-400 dark:text-neutral-50"">
                 Status
               </label>
               <select
