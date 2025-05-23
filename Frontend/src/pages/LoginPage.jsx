@@ -9,28 +9,27 @@ function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
   
   const { login } = useAuth()
   const navigate = useNavigate()
   
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
-    // Reset error
     setError('')
-    
-    // Simple validation
-    if (!email || !password) {
-      setError('Please enter both email and password')
-      return
-    }
-    
+    setSuccessMessage('')
+
     try {
       setLoading(true)
-      const success = login(email, password)
+      const success = await login(email, password)
       
       if (success) {
-        navigate('/dashboard')
+        setSuccessMessage('Login successful! Redirecting...')
+        
+        // Wait for 3 seconds before navigating
+        setTimeout(() => {
+          navigate('/dashboard')
+        }, 3000)
       } else {
         setError('Invalid email or password')
       }
@@ -73,6 +72,16 @@ function LoginPage() {
             >
               <FiAlertCircle className="h-5 w-5 mr-3" />
               <span>{error}</span>
+            </motion.div>
+          )}
+
+          {successMessage && (
+            <motion.div
+              className="p-4 bg-green-50 border border-green-200 rounded-md flex items-center text-green-700 dark:bg-green-900/20 dark:border-green-800 dark:text-green-400"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <span>{successMessage}</span>
             </motion.div>
           )}
           
@@ -157,14 +166,11 @@ function LoginPage() {
           <span className="text-neutral-600 dark:text-neutral-400">
             Don't have an account?{' '}
           </span>
-          <Link to="#" className="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300">
-            Contact us
+          <Link to="/register" className="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300">
+            Sign up
           </Link>
         </div>
         
-        <div className="text-center text-xs text-neutral-500 mt-8 dark:text-neutral-500">
-          <p>For demo purposes, you can use any email and password to login</p>
-        </div>
       </motion.div>
     </div>
   )

@@ -10,6 +10,7 @@ import DashboardLayout from './layouts/DashboardLayout'
 // Pages
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
+import RegisterPage from './pages/RegisterPage'
 import DashboardPage from './pages/DashboardPage'
 import CompaniesPage from './pages/CompaniesPage'
 import CompanyDetailsPage from './pages/CompanyDetailsPage'
@@ -31,6 +32,7 @@ function App() {
     window.scrollTo(0, 0)
   }, [location.pathname])
 
+
   return (
     <div className={darkMode ? 'dark' : ''}>
       <Routes>
@@ -38,6 +40,7 @@ function App() {
         <Route path="/" element={<MainLayout />}>
           <Route index element={<HomePage />} />
           <Route path="login" element={<LoginPage />} />
+          <Route path="register" element={<RegisterPage />} />
           <Route path="companies" element={<CompaniesPage />} />
           <Route path="companies/:id" element={<CompanyDetailsPage />} />
         </Route>

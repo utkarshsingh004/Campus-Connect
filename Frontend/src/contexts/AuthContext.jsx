@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
+import axios from 'axios'
 
 const AuthContext = createContext()
 
@@ -17,24 +18,71 @@ export function AuthProvider({ children }) {
     setLoading(false)
   }, [])
 
-  // Login function
-  const login = (email, password) => {
-    // This is a mock login - in a real app, you would validate with a backend
-    if (email && password) {
-      const user = {
-        id: '1',
-        name: 'College Admin',
+  // Register function with 3-second auto logout and no localStorage save
+  const register = async ({ collageName, email, password }) => {
+    try {
+      const response = await axios.post('http://localhost:9000/api/v1/users/register', {
+        collageName,
         email,
-        role: 'admin',
-        college: 'Demo University'
+        password,
+      })
+
+      if (response.data?.success) {
+        const user = response.data.user || {
+          id: response.data._id,
+          collageName,
+          email,
+          role: response.data.role || 'user',
+        }
+
+        // Return a promise that resolves after 3 seconds with the success message
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve({ success: true, message: 'Registration successful!' })
+          }, 3000)
+        })
       }
-      setCurrentUser(user)
-      setIsLoggedIn(true)
-      localStorage.setItem('user', JSON.stringify(user))
-      return true
+
+      return { success: false, message: 'Registration failed. Please try again.' }
+    } catch (err) {
+      console.error('Registration failed:', err)
+      return { success: false, message: 'An error occurred during registration.' }
     }
-    return false
   }
+
+  // login function
+  const login = async (email, password) => {
+    try {
+      if (!email || !password) return false;
+  
+      const response = await axios.post('http://localhost:9000/api/v1/users/login', {
+        email,
+        password,
+      });
+  
+      if (response.data?.success) {
+        const user = response.data.user || {
+          id: response.data._id,
+          name: response.data.name || 'User',
+          email,
+          role: response.data.role || 'user',
+          college: response.data.collegeName || '',
+        };
+  
+        setCurrentUser(user);
+        setIsLoggedIn(true);
+        localStorage.setItem('user', JSON.stringify(user));
+  
+        return true;
+      } else {
+        return false;
+      }
+    } catch (err) {
+      console.error('Login failed:', err);
+      return false;
+    }
+  };
+  
 
   // Logout function
   const logout = () => {
@@ -48,7 +96,8 @@ export function AuthProvider({ children }) {
     isLoggedIn,
     loading,
     login,
-    logout
+    logout,
+    register,
   }
 
   return (
