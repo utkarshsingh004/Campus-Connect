@@ -101,7 +101,7 @@ function CompaniesPage() {
             {(searchTerm || industryFilter || statusFilter) && (
               <button
                 onClick={resetFilters}
-                className="btn btn-outline flex items-center space-x-2 border-error-300 text-error-600 hover:bg-error-50 dark:border-error-700 dark:text-error-400 dark:hover:bg-error-900/20"
+                className="btn btn-outline flex items-center space-x-2 border-error-300 text-error-600 hover:bg-error-500\ dark:border-error-700 dark:text-error-400 dark:hover:bg-error-900/20"
               >
                 <FiX className="h-4 w-4" />
                 <span>Clear</span>
@@ -120,31 +120,31 @@ function CompaniesPage() {
             transition={{ duration: 0.3 }}
           >
             <div>
-              <label htmlFor="industry-filter" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                Industry
-              </label>
-              <select
-                id="industry-filter"
-                value={industryFilter}
-                onChange={(e) => setIndustryFilter(e.target.value)}
-                className="input mt-1"
-              >
-                <option value="">All Industries</option>
-                {industries.map((industry) => (
-                  <option key={industry} value={industry}>{industry}</option>
-                ))}
-              </select>
-            </div>
+                <label htmlFor="industry-filter" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                  Industry
+                </label>
+                <select
+                  id="industry-filter"
+                  value={industryFilter}
+                  onChange={(e) => setIndustryFilter(e.target.value)}
+                  className="input mt-1 text-neutral-900 dark:text-white bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600"
+                >
+                  <option value="">All Industries</option>
+                  {industries.map((industry) => (
+                    <option key={industry} value={industry}>{industry}</option>
+                  ))}
+                </select>
+              </div>
             
-            <div>
-              <label htmlFor="status-filter" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+              <div>
+              <label htmlFor="status-filter" className="block text-sm font-medium text-neutral-200 dark:text-white">
                 Status
               </label>
               <select
                 id="status-filter"
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="input mt-1"
+                className="input mt-1 text-neutral-900 dark:text-white bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600"
               >
                 <option value="">All Status</option>
                 <option value="Confirmed">Confirmed</option>
