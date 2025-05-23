@@ -29,7 +29,7 @@ function LoginPage() {
         // Wait for 3 seconds before navigating
         setTimeout(() => {
           navigate('/dashboard')
-        }, 3000)
+        }, 2000)
       } else {
         setError('Invalid email or password')
       }
