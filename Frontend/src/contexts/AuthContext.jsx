@@ -63,11 +63,11 @@ export function AuthProvider({ children }) {
       if (response.data?.success) {
         const user = response.data.user || {
           id: response.data._id,
-          name: response.data.name || 'User',
+          // name: response.data.collageName,
           email,
           role: response.data.role || 'user',
-          college: response.data.collegeName || '',
-        };
+          collageName: response.data.collageName || 'LNCT',
+        };        
   
         setCurrentUser(user);
         setIsLoggedIn(true);

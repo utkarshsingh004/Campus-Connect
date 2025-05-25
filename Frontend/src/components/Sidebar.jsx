@@ -58,7 +58,7 @@ function Sidebar({ open, toggleSidebar }) {
             {/* College info */}
             <div className="px-4 py-4 border-b border-neutral-200 dark:border-neutral-700">
               <p className="text-xs font-medium text-neutral-500 uppercase tracking-wide dark:text-neutral-400">College</p>
-              <h2 className="mt-1 text-sm font-medium text-neutral-900 dark:text-white">{currentUser?.college || 'Demo University'}</h2>
+              <h2 className="mt-1 text-sm font-medium text-neutral-900 dark:text-white">{currentUser?.c }</h2>
             </div>
             
             {/* Navigation */}
