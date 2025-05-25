@@ -61,7 +61,7 @@ export function AuthProvider({ children }) {
       });
   
       if (response.data?.success) {
-        const user = response.data.user || {
+        const user = await response.data.user || {
           id: response.data._id,
           // name: response.data.collageName,
           email,
