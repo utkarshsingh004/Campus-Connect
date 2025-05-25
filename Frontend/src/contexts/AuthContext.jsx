@@ -133,7 +133,7 @@ export function AuthProvider({ children }) {
 
   const BASE_URL =
     process.env.NODE_ENV === 'production'
-      ? 'https://your-production-api.com'
+      ? 'https://campus-connect-frontend-fufn.onrender.com'
       : 'http://localhost:9000';
 
   // Load user from localStorage on first render
