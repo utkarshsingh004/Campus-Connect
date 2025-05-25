@@ -1,8 +1,9 @@
 import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/apiError.js";
 import { User } from "../models/user.models.js";
-// import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import ApiResponse from "../utils/apiResponse.js";
+import {Company} from "../models/companies.model.js"
 
 // Generate access and refresh tokens and store refresh token in DB
 const generateAccessAndRefreshToken = async (userId) => {
@@ -128,4 +129,64 @@ const logoutUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "User logged out"));
 });
 
-export { registerUser, loginUser, logoutUser };
+const addCompanies = asyncHandler(async (req, res) => {
+  const {
+    companyName, location, status, industry, visitDate, website,
+    description, process, title, department, type,
+    experience, ctc, eligibility, deadline, skills
+  } = req.body || {};
+
+  console.log("Incoming body:", req.body);
+  console.log("Files:", req.files);
+
+  const isEmpty = (field) =>
+    field === undefined ||
+    field === null ||
+    (typeof field === "string" && field.trim() === "") ||
+    (Array.isArray(field) && field.length === 0);
+
+  if (
+    [companyName, location, status, industry, visitDate, website,
+     description, process, title, department, type,
+     experience, ctc, eligibility, deadline, skills].some(isEmpty)
+  ) {
+    throw new ApiError(400, "All fields are required");
+  }
+
+  // Parse arrays and dates if sent as strings
+  const parsedProcess = typeof process === "string" ? process.split(",").map(p => p.trim()) : process;
+  const parsedSkills = typeof skills === "string" ? skills.split(",").map(s => s.trim()) : skills;
+  const parsedVisitDate = new Date(visitDate);
+  const parsedDeadline = new Date(deadline);
+
+  // Logo upload
+  const logoLocalPath = req.file?.path;
+  if (!logoLocalPath) {
+    throw new ApiError(400, "Logo file is required");
+  }
+
+  const logo = await uploadOnCloudinary(logoLocalPath);
+  if (!logo) {
+    throw new ApiError(400, "Failed to upload logo");
+  }
+
+  // Create the company
+  const company = await Company.create({
+    user: req.user._id,
+    companyName, location, status, industry,
+    visitDate: parsedVisitDate,
+    website, description, process: parsedProcess,
+    title, department, type,
+    experience, ctc, eligibility,
+    deadline: parsedDeadline,
+    skills: parsedSkills,
+    logo: logo.url
+  });
+
+  return res.status(201).json(
+    new ApiResponse(200, company, "New company registered successfully")
+  );
+});
+
+
+export { registerUser, loginUser, logoutUser , addCompanies };

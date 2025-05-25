@@ -44,10 +44,6 @@ connectDB()
         throw e
     })
     
-    // app.get('/u',(req,res)=>{
-    //     console.log("Get is used")
-    //             res.send("hi")
-    //          })
     app.listen(process.env.PORT || 8000, ()=>{
         console.log(`Server is running at port: ${process.env.PORT}`);
         
