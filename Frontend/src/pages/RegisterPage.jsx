@@ -40,7 +40,7 @@ function RegisterPage() {
         setError('')
         setTimeout(() => {
           navigate('/login')
-        }, 3000)
+        }, 1000)
       } else {
         setError(result.message || 'Registration failed. Try again.')
       }
