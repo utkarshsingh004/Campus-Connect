@@ -37,13 +37,11 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   const existedUser = await User.findOne({ email });
-
   if (existedUser) {
     throw new ApiError(409, "User with this email already exists");
   }
 
   const user = await User.create({ collageName, email, password });
-
   const createdUser = await User.findById(user._id).select("-password -refreshToken");
 
   if (!createdUser) {
@@ -64,19 +62,16 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 
   const user = await User.findOne({ email });
-
   if (!user) {
     throw new ApiError(404, "User does not exist");
   }
 
   const isPasswordValid = await user.isPasswordCorrect(password);
-
   if (!isPasswordValid) {
     throw new ApiError(401, "Invalid credentials");
   }
 
   const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);
-
   const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
 
   return res.status(200).json(
@@ -101,7 +96,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     { new: true }
   );
 
-  return res.status(200).json(new ApiResponse(200, {}, "User logged out"));
+  return res.status(200).json(new ApiResponse(200, {}, "User logged out", "success"));
 });
 
 // Add company controller
@@ -118,44 +113,22 @@ const addCompanies = asyncHandler(async (req, res) => {
     positions,
   } = req.body || {};
 
-  // Debug logs to check incoming data
-  console.log("Received company data:", {
-    name,
-    location,
-    status,
-    industry,
-    visitDate,
-    website,
-    description,
-    process,
-    positions,
-  });
-  console.log("Received file:", req.file);
-
-  // Validate required fields
   if (
-    [name, location, status, industry, visitDate, website, description, process, positions].some(isEmpty)
+    [name, location, status, industry, visitDate, website, description, process, positions].some(
+      isEmpty
+    )
   ) {
     throw new ApiError(400, "All fields are required");
   }
 
-  // Parse arrays if sent as JSON strings (frontend might stringify them)
+  // Parse arrays if sent as JSON strings
   const parsedProcess = typeof process === "string" ? JSON.parse(process) : process;
-  const parsedPositions = typeof positions === "string" ? JSON.parse(positions) : positions;
+  const parsedPositions =
+    typeof positions === "string" ? JSON.parse(positions) : positions;
   const parsedVisitDate = new Date(visitDate);
 
-  // Validate each position in array
   parsedPositions.forEach((pos, idx) => {
-    const {
-      title,
-      department,
-      type,
-      experience,
-      ctc,
-      eligibility,
-      deadline,
-      skills,
-    } = pos;
+    const { title, department, type, experience, ctc, eligibility, deadline, skills } = pos;
 
     if (
       [title, department, type, experience, ctc, eligibility, deadline, skills].some(isEmpty)
@@ -163,7 +136,6 @@ const addCompanies = asyncHandler(async (req, res) => {
       throw new ApiError(400, `Position at index ${idx} is missing required fields.`);
     }
 
-    // Parse skills if stringified
     if (typeof skills === "string") {
       pos.skills = JSON.parse(skills);
     }
@@ -172,18 +144,15 @@ const addCompanies = asyncHandler(async (req, res) => {
     pos.id = `POS${Date.now()}${idx}`;
   });
 
-  // Check for logo file upload
   if (!req.file || !req.file.path) {
     throw new ApiError(400, "Logo file is required");
   }
 
-  // Upload logo to cloudinary
   const logo = await uploadOnCloudinary(req.file.path);
   if (!logo || !logo.url) {
     throw new ApiError(400, "Failed to upload logo");
   }
 
-  // Create company linked to logged-in user (req.user must be set by auth middleware)
   const company = await Company.create({
     user: req.user._id,
     name,
@@ -199,7 +168,18 @@ const addCompanies = asyncHandler(async (req, res) => {
   });
 
   return res.status(201).json(
-    new ApiResponse(201, company, "New company registered successfully","success")
+    new ApiResponse(201, company, "New company registered successfully", "success")
+  );
+});
+
+// Companies dashboard controller
+const companiesDashboard = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+
+  const companies = await Company.find({ user: userId });
+
+  return res.status(200).json(
+    new ApiResponse(200, companies, "Companies fetched successfully", "success")
   );
 });
 
@@ -208,4 +188,5 @@ export {
   loginUser,
   logoutUser,
   addCompanies,
+  companiesDashboard,
 };

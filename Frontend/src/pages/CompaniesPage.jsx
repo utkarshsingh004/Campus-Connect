@@ -2,11 +2,11 @@ import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
-import { companies } from '../data/mockData'
+// import { companies } from '../data/mockData'
 import { FiSearch, FiFilter, FiX, FiPlus, FiChevronDown, FiEdit2, FiEye } from 'react-icons/fi'
 
 function CompaniesPage() {
-  const { isLoggedIn } = useAuth()
+  const { isLoggedIn, companies } = useAuth()
   const location = useLocation()
   const isDashboard = location.pathname.includes('/dashboard')
   

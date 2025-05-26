@@ -7,14 +7,34 @@ export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [companies, setCompanies] = useState([]); // ⭐ companies array state
+  const [companies, setCompanies] = useState([]);
 
   const BASE_URL =
     process.env.NODE_ENV === 'production'
-      ? '' // set your production URL here
+      ? 'https://campus-connect-backend-0u6m.onrender.com' 
       : 'http://localhost:9000';
 
-  // Load user from localStorage on first render
+  // 🔥 Helper function to fetch companies
+  const fetchCompanies = async (token) => {
+    if (!token) return;
+    try {
+      const response = await axios.get(`${BASE_URL}/api/v1/users/dashboard/companies`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.data?.success && response.data?.data) {
+        setCompanies(response.data.data);
+      } else {
+        console.log('Failed to fetch companies:', response.data?.message);
+      }
+    } catch (error) {
+      console.error('Error fetching companies:', error);
+    }
+  };
+
+  // 🔥 Load user & companies from localStorage on first render
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     try {
@@ -22,6 +42,7 @@ export function AuthProvider({ children }) {
         const parsedUser = JSON.parse(storedUser);
         setCurrentUser(parsedUser);
         setIsLoggedIn(true);
+        fetchCompanies(parsedUser.accessToken); // ⭐ fetch companies for this user
       }
     } catch (error) {
       console.error('Failed to parse stored user:', error);
@@ -30,31 +51,7 @@ export function AuthProvider({ children }) {
     setLoading(false);
   }, []);
 
-  // Optional: Load companies initially if needed (e.g., to show them in dashboard)
-  useEffect(() => {
-    const fetchCompanies = async () => {
-      if (currentUser?.accessToken) {
-        try {
-          const response = await axios.get(`${BASE_URL}/api/v1/users/dashboard/companies`, {
-            headers: {
-              Authorization: `Bearer ${currentUser.accessToken}`,
-            },
-          });
-
-          if (response.data?.success && response.data?.data) {
-            setCompanies(response.data.data); // set initial companies
-          } else {
-            console.log('Failed to fetch companies:', response.data?.message);
-          }
-        } catch (error) {
-          console.error('Error fetching companies:', error);
-        }
-      }
-    };
-
-    fetchCompanies();
-  }, [currentUser]); // re-fetch if the user changes
-
+  // 🔥 Register
   const register = async ({ collageName, email, password }) => {
     try {
       const response = await axios.post(`${BASE_URL}/api/v1/users/register`, {
@@ -78,6 +75,7 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // 🔥 Login
   const login = async (email, password) => {
     try {
       if (!email || !password) return false;
@@ -104,6 +102,9 @@ export function AuthProvider({ children }) {
         setIsLoggedIn(true);
         localStorage.setItem('user', JSON.stringify(loggedInUser));
 
+        // ⭐ Fetch companies after login
+        await fetchCompanies(accessToken);
+
         return true;
       }
 
@@ -114,6 +115,7 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // 🔥 Send company data
   const sendCompanyData = async (companyData) => {
     try {
       if (!currentUser?.accessToken) {
@@ -121,7 +123,6 @@ export function AuthProvider({ children }) {
       }
 
       const formData = new FormData();
-
       formData.append('logo', companyData.logo);
       formData.append('name', companyData.name);
       formData.append('location', companyData.location);
@@ -146,41 +147,9 @@ export function AuthProvider({ children }) {
       const companiesData = response?.data;
 
       if (companiesData?.success) {
-        const {
-          _id,
-          name,
-          logo,
-          location,
-          industry,
-          description,
-          website,
-          positions,
-          process,
-          visitDate,
-          status,
-        } = companiesData.data;
-
-        const newCompany = {
-          id: _id,
-          name,
-          logo,
-          industry,
-          description,
-          website,
-          location,
-          positions,
-          process,
-          visitDate,
-          status,
-        };
-
-        // Add new company to the companies list
-        setCompanies((prevCompanies) => [...prevCompanies, newCompany]);
-
-        console.log("Companies", companies);
-        
-
-        console.log('New company added:', newCompany);
+        // ⭐ Instead of adding manually, re-fetch from server for fresh data
+        await fetchCompanies(currentUser.accessToken);
+        console.log('New company added and companies list refreshed!');
       } else {
         console.log('Invalid or incomplete data:', companiesData);
       }
@@ -192,6 +161,7 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // 🔥 Logout
   const logout = () => {
     setCurrentUser(null);
     setIsLoggedIn(false);
@@ -207,7 +177,7 @@ export function AuthProvider({ children }) {
     logout,
     register,
     sendCompanyData,
-    companies, // ⭐ provide companies state to context
+    companies, // ⭐ companies available to context
   };
 
   return (
