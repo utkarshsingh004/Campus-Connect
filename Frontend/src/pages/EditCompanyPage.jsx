@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { companies } from '../data/mockData'
+import { useAuth } from '../contexts/AuthContext'
+// import { companies } from '../data/mockData'
 import { FiArrowLeft, FiPlus, FiTrash2, FiX, FiCheck, FiAlertCircle } from 'react-icons/fi'
 
 function EditCompanyPage() {
@@ -13,6 +14,8 @@ function EditCompanyPage() {
   const [currentSkill, setCurrentSkill] = useState('')
   const [errors, setErrors] = useState({})
   const [successMessage, setSuccessMessage] = useState('')
+
+  const {  companies } = useAuth()
   
   useEffect(() => {
     // In a real app, this would be an API call
@@ -255,7 +258,7 @@ function EditCompanyPage() {
     // Redirect after delay
     setTimeout(() => {
       navigate('/dashboard/companies')
-    }, 2000)
+    }, 1000)
   }
   
   return (

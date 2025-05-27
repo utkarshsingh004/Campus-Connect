@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { FiMail, FiLock, FiAlertCircle } from 'react-icons/fi';
 
-function LoginPage() {
+function HostLoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
@@ -12,7 +12,7 @@ function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
 
-  const { login } = useAuth();
+  const { hostLogin } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -22,12 +22,12 @@ function LoginPage() {
 
     try {
       setLoading(true);
-      const success = await login(email, password, false); // No host login here
+      const success = await hostLogin(email, password);
 
       if (success) {
         setSuccessMessage('Login successful! Redirecting...');
         setTimeout(() => {
-          navigate('/dashboard');
+          navigate('/host/dashboard');
         }, 1000);
       } else {
         setError('Invalid email or password');
@@ -38,10 +38,6 @@ function LoginPage() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleHostLoginClick = () => {
-    navigate('/hostlogin');
   };
 
   return (
@@ -59,10 +55,10 @@ function LoginPage() {
             </div>
           </div>
           <h2 className="mt-6 text-center text-3xl font-bold text-neutral-900 dark:text-white">
-            User Login
+           Host Login
           </h2>
           <p className="mt-2 text-center text-sm text-neutral-600 dark:text-neutral-400">
-            Access your college placement dashboard
+            Access your host dashboard
           </p>
         </div>
 
@@ -107,7 +103,7 @@ function LoginPage() {
                   required
                   disabled={loading}
                   className="input pl-10"
-                  placeholder="college@example.com"
+                  placeholder="host@example.com"
                 />
               </div>
             </div>
@@ -169,24 +165,16 @@ function LoginPage() {
           </div>
         </form>
 
-        <div className="flex flex-col items-center gap-2 text-sm mt-4">
-          <button
-            onClick={() => navigate('/college-registration-data')}
-            className="text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 font-medium"
-          >
-            Registration Query !
-          </button>
-
-          <button
-            onClick={handleHostLoginClick}
-            className="text-neutral-600 dark:text-neutral-400 hover:underline mt-2"
-          >
-            Host Login
-          </button>
+        <div className="text-center text-sm mt-4">
+          <span className="text-neutral-600 dark:text-neutral-400">
+          </span>
+          <Link to="/login" className="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300">
+            User Login
+          </Link>
         </div>
       </motion.div>
     </div>
   );
 }
 
-export default LoginPage;
+export default HostLoginPage;

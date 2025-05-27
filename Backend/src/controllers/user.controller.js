@@ -4,6 +4,7 @@ import { User } from "../models/user.models.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import ApiResponse from "../utils/apiResponse.js";
 import { Company } from "../models/companies.model.js";
+import CollegeContact from "../models/collegeRegistrationQuery.models.js";
 
 // Helper to check if a field is empty
 const isEmpty = (field) =>
@@ -50,6 +51,48 @@ const registerUser = asyncHandler(async (req, res) => {
 
   return res.status(201).json(
     new ApiResponse(201, createdUser, "User registered successfully", "success")
+  );
+});
+
+const registerCollege = asyncHandler(async (req, res) => {
+  const {
+    collegeName,
+    email,
+    contactNumber,
+    role,
+    address,
+    notes,
+  } = req.body;
+
+  // Validate required fields
+  if ([collegeName, email].some(isEmpty)) {
+    throw new ApiError(400, "College Name and Email are required");
+  }
+
+  // Optional: Check if the college with the same email already exists
+  const existingCollege = await CollegeContact.findOne({ email });
+  if (existingCollege) {
+    throw new ApiError(409, "College with this email already registered");
+  }
+
+  // Create the college contact entry
+  const college = await CollegeContact.create({
+    collegeName,
+    email,
+    contactNumber,
+    role,
+    address,
+    notes,
+  });
+
+  if (!college) {
+    throw new ApiError(500, "Error registering college");
+  }
+
+  const createdCollege = await CollegeContact.findById(college._id).select('-__v');
+
+  return res.status(201).json(
+    new ApiResponse(201, createdCollege, "College registered successfully", "success")
   );
 });
 
@@ -189,4 +232,5 @@ export {
   logoutUser,
   addCompanies,
   companiesDashboard,
+  registerCollege,
 };

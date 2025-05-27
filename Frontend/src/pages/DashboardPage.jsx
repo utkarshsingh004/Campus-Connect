@@ -32,8 +32,8 @@ function DashboardPage() {
   const handleLogout = () => {
     logout()
     setTimeout(() => {
-      navigate('/login')
-    }, 3000)
+      navigate('/')
+    }, 1000)
   }
 
   const chartData = {

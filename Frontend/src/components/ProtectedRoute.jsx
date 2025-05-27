@@ -9,4 +9,16 @@ function ProtectedRoute({ children, isLoggedIn }) {
   return children
 }
 
-export default ProtectedRoute
+function HostProtectedRoute({ children, isLoggedIn }) {
+  if (!isLoggedIn) {
+    // Redirect to login if not logged in
+    return <Navigate to="/hostlogin" replace />;
+  }
+
+  return children;
+}  
+
+export { 
+  ProtectedRoute,
+  HostProtectedRoute
+}

@@ -282,4 +282,78 @@ export const testimonials = [
     image: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
     quote: 'Our students love how they can easily browse through companies and track their application status. It has made the placement season much less stressful.'
   }
+
+
 ]
+
+export const hostStats = {
+  totalHosts: 25,
+  activeHosts: 20,
+  inactiveHosts: 5,
+  totalUsers: 3400,
+  totalPositions: 15,
+  totalApplications: 5000,
+  totalCompaniesVisited: 6,
+  upcomingVisits: 3,
+  completedVisits: 3,
+  // Monthly onboarding of hosts (for chart)
+  monthlyOnboarding: [
+    { month: 'Jan', hosts: 2 },
+    { month: 'Feb', hosts: 3 },
+    { month: 'Mar', hosts: 4 },
+    { month: 'Apr', hosts: 2 },
+    { month: 'May', hosts: 3 },
+    { month: 'Jun', hosts: 4 },
+    { month: 'Jul', hosts: 2 },
+  ],
+  // Host-wise placement activities (mock data)
+  hostActivities: [
+    { hostName: 'Ravi Kumar', companiesManaged: 3, usersManaged: 120 },
+    { hostName: 'Anjali Mehta', companiesManaged: 4, usersManaged: 150 },
+    { hostName: 'Rajesh Singh', companiesManaged: 2, usersManaged: 100 },
+    { hostName: 'Meera Sharma', companiesManaged: 1, usersManaged: 80 },
+  ],
+};
+
+export const events = [
+  {
+    id: 'e1',
+    title: 'TechSoft Placement Drive',
+    type: 'Placement Drive',
+    date: '2025-06-01',
+    host: 'Ravi Kumar',
+    participants: 120,
+    status: 'Completed',
+    description: 'A placement drive for TechSoft Solutions with multiple roles offered.',
+  },
+  {
+    id: 'e2',
+    title: 'Finance Career Webinar',
+    type: 'Webinar',
+    date: '2025-06-05',
+    host: 'Anjali Mehta',
+    participants: 80,
+    status: 'Upcoming',
+    description: 'A webinar covering career opportunities in the finance sector.',
+  },
+  {
+    id: 'e3',
+    title: 'InnovateTech Hiring Interviews',
+    type: 'Interviews',
+    date: '2025-06-10',
+    host: 'Rajesh Singh',
+    participants: 60,
+    status: 'Upcoming',
+    description: 'Technical interviews for InnovateTech’s ML Engineer role.',
+  },
+  {
+    id: 'e4',
+    title: 'ConsultEdge Strategy Workshop',
+    type: 'Workshop',
+    date: '2025-06-12',
+    host: 'Meera Sharma',
+    participants: 50,
+    status: 'Completed',
+    description: 'A workshop focused on strategic consulting practices and case studies.',
+  },
+];

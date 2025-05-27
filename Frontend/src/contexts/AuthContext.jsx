@@ -5,6 +5,7 @@ const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
+  const [currentHost, setCurrentHost] = useState(null); // New state for host
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
   const [companies, setCompanies] = useState([]);
@@ -14,16 +15,13 @@ export function AuthProvider({ children }) {
       ? 'https://campus-connect-backend-0u6m.onrender.com' 
       : 'http://localhost:9000';
 
-  // 🔥 Helper function to fetch companies
+  // Helper function to fetch companies
   const fetchCompanies = async (token) => {
     if (!token) return;
     try {
       const response = await axios.get(`${BASE_URL}/api/v1/users/dashboard/companies`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
-
       if (response.data?.success && response.data?.data) {
         setCompanies(response.data.data);
       } else {
@@ -34,24 +32,32 @@ export function AuthProvider({ children }) {
     }
   };
 
-  // 🔥 Load user & companies from localStorage on first render
+  // Load user & host from localStorage on first render
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
+    const storedHost = localStorage.getItem('host');
     try {
       if (storedUser && storedUser !== 'undefined') {
         const parsedUser = JSON.parse(storedUser);
         setCurrentUser(parsedUser);
         setIsLoggedIn(true);
-        fetchCompanies(parsedUser.accessToken); // ⭐ fetch companies for this user
+        fetchCompanies(parsedUser.accessToken);
+      }
+      if (storedHost && storedHost !== 'undefined') {
+        const parsedHost = JSON.parse(storedHost);
+        setCurrentHost(parsedHost);
+        setIsLoggedIn(true);
+        fetchCompanies(parsedHost.accessToken);
       }
     } catch (error) {
-      console.error('Failed to parse stored user:', error);
+      console.error('Failed to parse stored user/host:', error);
       localStorage.removeItem('user');
+      localStorage.removeItem('host');
     }
     setLoading(false);
   }, []);
 
-  // 🔥 Register
+  // Register
   const register = async ({ collageName, email, password }) => {
     try {
       const response = await axios.post(`${BASE_URL}/api/v1/users/register`, {
@@ -59,15 +65,10 @@ export function AuthProvider({ children }) {
         email,
         password,
       });
-
+  
       if (response.data?.success) {
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            resolve({ success: true, message: 'Registration successful!' });
-          }, 3000);
-        });
+        return { success: true, message: 'Registration successful!' };
       }
-
       return { success: false, message: 'Registration failed. Please try again.' };
     } catch (err) {
       console.error('Registration failed:', err);
@@ -75,16 +76,41 @@ export function AuthProvider({ children }) {
     }
   };
 
-  // 🔥 Login
+  // College-Registration
+  const registerCollege = async ({
+    collegeName,
+    email,
+    contactNumber,
+    role,
+    address,
+    notes,
+  }) => {
+    try {
+      const response = await axios.post(`${BASE_URL}/api/v1/users/college-registration-data`, {
+        collegeName,
+        email,
+        contactNumber,
+        role,
+        address,
+        notes,
+      });
+  
+      if (response.data?.success) {
+        return { success: true, message: 'College registration successful!' };
+      }
+      return { success: false, message: 'Registration failed. Please try again.' };
+    } catch (err) {
+      console.error('College registration failed:', err);
+      return { success: false, message: 'An error occurred during registration.' };
+    }
+  };
+  
+  // Login (User)
   const login = async (email, password) => {
     try {
       if (!email || !password) return false;
 
-      const response = await axios.post(`${BASE_URL}/api/v1/users/login`, {
-        email,
-        password,
-      });
-
+      const response = await axios.post(`${BASE_URL}/api/v1/users/login`, { email, password });
       const resData = response?.data;
 
       if (resData?.success) {
@@ -101,13 +127,13 @@ export function AuthProvider({ children }) {
         setCurrentUser(loggedInUser);
         setIsLoggedIn(true);
         localStorage.setItem('user', JSON.stringify(loggedInUser));
+        localStorage.removeItem('host'); // Clear host on user login
+        setCurrentHost(null);
 
-        // ⭐ Fetch companies after login
         await fetchCompanies(accessToken);
 
         return true;
       }
-
       return false;
     } catch (err) {
       console.error('Login failed:', err?.response?.data || err.message);
@@ -115,12 +141,64 @@ export function AuthProvider({ children }) {
     }
   };
 
-  // 🔥 Send company data
+  // Host Login
+  const hostLogin = async (email, password) => {
+    try {
+      if (!email || !password) return false;
+
+      const response = await axios.post(`${BASE_URL}/api/v1/host/login`, { email, password });
+      const resData = response?.data;
+
+      if (resData?.success) {
+        const { host, accessToken, refreshToken } = resData?.data;
+
+        const loggedInHost = {
+          id: host._id,
+          name: host.name,
+          email: host.email,
+          accessToken,
+          refreshToken,
+        };
+
+        setCurrentHost(loggedInHost);
+        setIsLoggedIn(true);
+        localStorage.setItem('host', JSON.stringify(loggedInHost));
+        localStorage.removeItem('user'); // Clear user on host login
+        setCurrentUser(null);
+
+        await fetchCompanies(accessToken);
+
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.error('Host login failed:', err?.response?.data || err.message);
+      return false;
+    }
+  };
+
+  // Logout (User)
+  const logout = () => {
+    setCurrentUser(null);
+    setIsLoggedIn(false);
+    localStorage.removeItem('user');
+    setCompanies([]);
+  };
+
+  // Logout (Host)
+  const hostLogout = () => {
+    setCurrentHost(null);
+    setIsLoggedIn(false);
+    localStorage.removeItem('host');
+    setCompanies([]);
+  };
+  
+
+  // Send company data (uses either user or host token)
   const sendCompanyData = async (companyData) => {
     try {
-      if (!currentUser?.accessToken) {
-        throw new Error('User is not authenticated');
-      }
+      const token = currentUser?.accessToken || currentHost?.accessToken;
+      if (!token) throw new Error('User or host is not authenticated');
 
       const formData = new FormData();
       formData.append('logo', companyData.logo);
@@ -137,18 +215,13 @@ export function AuthProvider({ children }) {
       const response = await axios.post(
         `${BASE_URL}/api/v1/users/dashboard/companies/add`,
         formData,
-        {
-          headers: {
-            Authorization: `Bearer ${currentUser.accessToken}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       const companiesData = response?.data;
 
       if (companiesData?.success) {
-        // ⭐ Instead of adding manually, re-fetch from server for fresh data
-        await fetchCompanies(currentUser.accessToken);
+        await fetchCompanies(token);
         console.log('New company added and companies list refreshed!');
       } else {
         console.log('Invalid or incomplete data:', companiesData);
@@ -161,27 +234,22 @@ export function AuthProvider({ children }) {
     }
   };
 
-  // 🔥 Logout
-  const logout = () => {
-    setCurrentUser(null);
-    setIsLoggedIn(false);
-    localStorage.removeItem('user');
-    setCompanies([]); // clear companies on logout
-  };
-
-  const value = {
-    currentUser,
-    isLoggedIn,
-    loading,
-    login,
-    logout,
-    register,
-    sendCompanyData,
-    companies, // ⭐ companies available to context
-  };
-
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{
+      currentUser,
+      currentHost,
+      isLoggedIn,
+      loading,
+      login,
+      logout,
+      register,
+      sendCompanyData,
+      companies,
+      hostLogin,
+      hostLogout,
+      setCurrentHost,
+      registerCollege
+    }}>
       {!loading && children}
     </AuthContext.Provider>
   );
