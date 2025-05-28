@@ -11,7 +11,6 @@ function Sidebar({ open, toggleSidebar }) {
     { path: '/dashboard/companies', icon: <FiUsers />, label: 'Companies' },
     { path: '/dashboard/companies/add', icon: <FiPlusCircle />, label: 'Add Company' },
     { path: '/dashboard/stats', icon: <FiBarChart2 />, label: 'Statistics' },
-    { path: '#settings', icon: <FiSettings />, label: 'Settings' }
   ]
   
   return (

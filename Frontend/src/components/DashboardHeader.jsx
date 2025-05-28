@@ -1,11 +1,20 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useTheme } from '../contexts/ThemeContext'
-import { FiMenu, FiSun, FiMoon, FiBell, FiUser } from 'react-icons/fi'
+import { FiMenu, FiSun, FiMoon, FiBell, FiUser, FiLogOut } from 'react-icons/fi'
 
 function DashboardHeader({ toggleSidebar }) {
-  const { currentUser } = useAuth()
+  const { currentUser, hostLogout } = useAuth()
   const { darkMode, toggleDarkMode } = useTheme()
+
+  const handleLogout = () => {
+    try {
+      hostLogout(); // use hostLogout instead of logout
+      navigate('/'); // Redirect to homepage after logout
+    } catch (error) {
+      console.error('Logout failed', error);
+    }
+  };
   
   return (
     <header className="bg-white shadow-sm dark:bg-neutral-800 z-10">
@@ -54,9 +63,18 @@ function DashboardHeader({ toggleSidebar }) {
                 </span>
               </div>
             </div>
+            <button
+              type="button"
+              className="p-2 rounded-full text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-700"
+              aria-label="Logout"
+              onClick={handleLogout}
+            >
+              <FiLogOut className="h-5 w-5" />
+            </button>
           </div>
         </div>
       </div>
+      
     </header>
   )
 }

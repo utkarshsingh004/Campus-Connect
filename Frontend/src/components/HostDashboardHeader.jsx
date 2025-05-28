@@ -3,7 +3,6 @@ import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { FiMenu, FiSun, FiMoon, FiBell, FiUser, FiLogOut } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
-import { use } from 'react';
 
 function HostHeader({ toggleSidebar }) {
   const { currentHost, hostLogout } = useAuth();  // <-- get hostLogout here
@@ -33,7 +32,7 @@ function HostHeader({ toggleSidebar }) {
               <FiMenu className="h-6 w-6" />
             </button>
             <h1 className="ml-2 md:ml-0 text-lg font-semibold text-neutral-900 dark:text-white">
-              {currentHost?.name ? `${currentHost.name}'s Host Dashboard` : 'Host Dashboard'}
+               Host Dashboard
             </h1>
           </div>
 

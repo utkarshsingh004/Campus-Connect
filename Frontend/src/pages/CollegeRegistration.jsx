@@ -14,7 +14,7 @@ function CollegeContactForm() {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const { registerCollege } = useAuth(); // Assuming useAuth provides registerCollege
+  const { registerCollege } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -55,7 +55,7 @@ function CollegeContactForm() {
   };
 
   return (
-    <div className="max-w-md mx-auto p-4 bg-white shadow rounded-md dark:bg-neutral-800">
+    <div className="max-w-md mx-auto p-4 bg-white shadow rounded-md dark:bg-black">
       <h2 className="text-2xl font-semibold mb-4 text-neutral-900 dark:text-white">
         College Contact Form
       </h2>

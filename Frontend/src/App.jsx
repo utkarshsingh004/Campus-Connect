@@ -6,6 +6,7 @@ import { useAuth } from "./contexts/AuthContext";
 // Layouts
 import MainLayout from "./layouts/MainLayout";
 import DashboardLayout from "./layouts/DashboardLayout";
+import HostDashboardLayout from "./layouts/HostDashboardLayout";
 
 // Pages
 import HomePage from "./pages/HomePage";
@@ -18,10 +19,11 @@ import AddCompanyPage from "./pages/AddCompanyPage";
 import EditCompanyPage from "./pages/EditCompanyPage";
 import StatsPage from "./pages/StatsPage";
 import NotFoundPage from "./pages/NotFoundPage";
-import HostDashboardLayout from "./layouts/HostDashboardLayout";
 import HostLoginPage from "./pages/HostLogin";
 import CollegeContactForm from "./pages/CollegeRegistration";
 import ThankYouPage from "./pages/Thankyou";
+import HostDashboard from "./pages/HostDashboard";
+import NewUser from "./pages/NewUserRequest";
 
 // Components
 import {
@@ -31,7 +33,7 @@ import {
 
 function App() {
   const { darkMode } = useTheme();
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, hostIsLoggedIn} = useAuth();
   const location = useLocation();
 
   useEffect(() => {
@@ -46,10 +48,14 @@ function App() {
           <Route index element={<HomePage />} />
           <Route path="login" element={<LoginPage />} />
           <Route path="register" element={<RegisterPage />} />
+          <Route path="host/register-new-user" element={<RegisterPage />} />
           <Route path="companies" element={<CompaniesPage />} />
           <Route path="companies/:id" element={<CompanyDetailsPage />} />
           <Route path="hostlogin" element={<HostLoginPage />} />
-          <Route path="college-registration-data" element={<CollegeContactForm />} />
+          <Route
+            path="college-registration-data"
+            element={<CollegeContactForm />}
+          />
           <Route path="thankyou" element={<ThankYouPage />} />
         </Route>
 
@@ -73,16 +79,22 @@ function App() {
         <Route
           path="/host/dashboard"
           element={
-            <HostProtectedRoute isLoggedIn={isLoggedIn}>
+            <HostProtectedRoute isLoggedIn={hostIsLoggedIn}>
               <HostDashboardLayout />
             </HostProtectedRoute>
           }
-        />
+        >
+          <Route index element={<HostDashboard />} />
+          <Route path="register-new-user" element={< NewUser/>} />
+          
+         
+        </Route>
 
+        {/* Host registration page (signup) */}
         <Route
           path="/signup"
           element={
-            <HostProtectedRoute isLoggedIn={isLoggedIn}>
+            <HostProtectedRoute isLoggedIn={hostIsLoggedIn}>
               <RegisterPage />
             </HostProtectedRoute>
           }

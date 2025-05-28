@@ -36,6 +36,8 @@ const CollegeContactSchema = new mongoose.Schema({
   timestamps: true, // Adds createdAt and updatedAt fields
 });
 
-const CollegeContact = mongoose.model('CollegeContact', CollegeContactSchema);
+ const CollegeContact = mongoose.model('CollegeContact', CollegeContactSchema);
 
-export default CollegeContact;
+ export default CollegeContact
+
+

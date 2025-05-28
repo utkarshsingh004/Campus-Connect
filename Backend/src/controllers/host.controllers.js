@@ -3,6 +3,8 @@ import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/apiError.js";
 import ApiResponse from "../utils/apiResponse.js";
 import { Host } from "../models/host.models.js";
+import { User } from "../models/user.models.js"; 
+import  CollegeContact  from "../models/collegeRegistrationQuery.models.js";
 
 // Helper function to generate access and refresh tokens
 const generateAccessAndRefreshToken = async (hostId) => {
@@ -93,4 +95,29 @@ const loginHost = asyncHandler(async (req, res) => {
   );
 });
 
-export { registerHost, loginHost };
+// Controller to get all users
+const allUsers = asyncHandler(async (req, res) => {
+  const users = await User.find().select("-password -refreshToken");
+  if (!users || users.length === 0) {
+    throw new ApiError(404, "No users found");
+  }
+
+  return res.status(200).json(
+    new ApiResponse(200, users, "All users fetched successfully", "success")
+  );
+});
+
+// Fetch **all new users** (who are marked as "new")
+const allNewUsers = asyncHandler(async (req, res) => {
+  const newUsers = await CollegeContact.find().select("-password");
+  if (!newUsers || newUsers.length === 0) {
+    throw new ApiError(404, "No new users found");
+  }
+  return res.status(200).json(
+    new ApiResponse(200, newUsers, "New users fetched successfully", "success")
+  );
+});
+
+
+
+export { registerHost, loginHost, allUsers, allNewUsers };

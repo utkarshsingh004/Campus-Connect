@@ -1,8 +1,8 @@
-import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { useAuth } from '../contexts/AuthContext'
-import { FiUser, FiMail, FiLock, FiAlertCircle } from 'react-icons/fi'
+import { useEffect, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom'; // Add useLocation
+import { motion } from 'framer-motion';
+import { useAuth } from '../contexts/AuthContext';
+import { FiUser, FiMail, FiLock, FiAlertCircle } from 'react-icons/fi';
 
 function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -10,59 +10,74 @@ function RegisterPage() {
     email: '',
     password: '',
     confirmPassword: '',
-  })
-  const [error, setError] = useState('')
-  const [message, setMessage] = useState('')   // For success message
-  const [loading, setLoading] = useState(false)
+  });
+  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const { register } = useAuth()
-  const navigate = useNavigate()
+  const { register } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation(); // Get current location
+
+  // When the component mounts, parse query params and set them to formData
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const nameParam = params.get('name');
+    const emailParam = params.get('email');
+
+    setFormData((prev) => ({
+      ...prev,
+      collageName: nameParam || '',
+      email: emailParam || '',
+    }));
+  }, [location.search]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError('')
-    setMessage('')
-    const { collageName, email, password, confirmPassword } = formData
+    e.preventDefault();
+    setError('');
+    setMessage('');
+    const { collageName, email, password, confirmPassword } = formData;
 
     if (!collageName || !email || !password || !confirmPassword) {
-      return setError('Please fill in all required fields')
+      return setError('Please fill in all required fields');
     }
 
     if (password !== confirmPassword) {
-      return setError('Passwords do not match')
+      return setError('Passwords do not match');
     }
 
     try {
-      setLoading(true)
-      const result = await register({ collageName, email, password })
+      setLoading(true);
+      const result = await register({ collageName, email, password });
       if (result.success) {
-        setMessage(result.message)
-        setError('')
+        setMessage(result.message);
+        setError('');
         setTimeout(() => {
-          navigate('/login')
-        }, 1000)
+          navigate('/host/dashboard');
+        }, 1000);
       } else {
-        setError(result.message || 'Registration failed. Try again.')
+        setError(result.message || 'Registration failed. Try again.');
       }
     } catch (err) {
-      console.error(err)
-      setError('Error during registration')
+      console.error(err);
+      setError('Error during registration');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-neutral-50 dark:bg-neutral-900 px-4 py-12">
       <motion.div
-        className="max-w-md w-full bg-white dark:bg-neutral-800 p-10 rounded-xl shadow-md space-y-6"
+        className="max-w-2xl w-full bg-white dark:bg-neutral-800 p-16 rounded-2xl shadow-xl space-y-8"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-neutral-900 dark:text-white">Create an Account</h2>
-          <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-2">Join the placement portal</p>
+          <h2 className="text-4xl font-bold text-neutral-900 dark:text-white">
+            Add new user
+          </h2>
         </div>
 
         {(error || message) && (
@@ -80,14 +95,16 @@ function RegisterPage() {
           </motion.div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <InputWithIcon
-            label="Collage Name"
+            label="College Name"
             type="text"
             placeholder="John Doe"
             icon={FiUser}
             value={formData.collageName}
-            onChange={(e) => setFormData({ ...formData, collageName: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, collageName: e.target.value })
+            }
           />
 
           <InputWithIcon
@@ -96,7 +113,9 @@ function RegisterPage() {
             placeholder="you@example.com"
             icon={FiMail}
             value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, email: e.target.value })
+            }
           />
 
           <InputWithIcon
@@ -105,7 +124,9 @@ function RegisterPage() {
             placeholder="••••••••"
             icon={FiLock}
             value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, password: e.target.value })
+            }
           />
 
           <InputWithIcon
@@ -114,40 +135,43 @@ function RegisterPage() {
             placeholder="••••••••"
             icon={FiLock}
             value={formData.confirmPassword}
-            onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, confirmPassword: e.target.value })
+            }
           />
 
-          <button type="submit" disabled={loading} className="btn btn-primary w-full py-3">
+          <button
+            type="submit"
+            disabled={loading}
+            className="btn btn-primary w-full py-4 text-lg"
+          >
             {loading ? 'Registering...' : 'Register'}
           </button>
         </form>
-
-        <div className="text-center text-sm mt-4">
-          <span className="text-neutral-600 dark:text-neutral-400">Already have an account? </span>
-          <Link
-            to="/login"
-            className="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
-          >
-            Sign in
-          </Link>
-        </div>
       </motion.div>
     </div>
-  )
+  );
 }
 
 function InputWithIcon({ label, type, placeholder, icon: Icon, ...props }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300">{label}</label>
+      <label className="block text-base font-medium text-neutral-700 dark:text-neutral-300">
+        {label}
+      </label>
       <div className="mt-1 relative">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Icon className="h-5 w-5 text-neutral-400" />
+          <Icon className="h-6 w-6 text-neutral-400" />
         </div>
-        <input type={type} className="input pl-10" placeholder={placeholder} {...props} />
+        <input
+          type={type}
+          className="input pl-12 py-3 text-base"
+          placeholder={placeholder}
+          {...props}
+        />
       </div>
     </div>
-  )
+  );
 }
 
-export default RegisterPage
+export default RegisterPage;

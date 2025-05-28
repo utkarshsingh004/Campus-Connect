@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
 import { companies, placementStats } from '../data/mockData'
-import { FiPlus, FiArrowRight, FiUser, FiBriefcase, FiDollarSign, FiTrendingUp, FiLogOut } from 'react-icons/fi'
+import { FiPlus, FiArrowRight, FiUser, FiBriefcase, FiDollarSign, FiTrendingUp } from 'react-icons/fi'
 import { Bar } from 'react-chartjs-2'
 import {
   Chart as ChartJS,
@@ -25,16 +25,9 @@ ChartJS.register(
 )
 
 function DashboardPage() {
-  const { currentUser, logout } = useAuth()
+  const { currentUser } = useAuth()
   const [timeFilter, setTimeFilter] = useState('all')
   const navigate = useNavigate()
-
-  const handleLogout = () => {
-    logout()
-    setTimeout(() => {
-      navigate('/')
-    }, 1000)
-  }
 
   const chartData = {
     labels: placementStats.monthlyData.map(item => item.month),
@@ -171,13 +164,6 @@ function DashboardPage() {
             <FiPlus className="h-4 w-4" />
             <span>Add Company</span>
           </Link>
-          <button
-            onClick={handleLogout}
-            className="btn btn-secondary flex items-center space-x-2"
-          >
-            <FiLogOut className="h-4 w-4" />
-            <span>Logout</span>
-          </button>
         </div>
       </div>
 

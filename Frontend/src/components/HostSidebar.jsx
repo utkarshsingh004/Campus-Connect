@@ -4,14 +4,11 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { FiHome, FiUsers, FiCalendar, FiPlusCircle, FiSettings, FiX } from 'react-icons/fi'
 
 function HostSidebar({ open, toggleSidebar }) {
-  const { currentUser } = useAuth()
+  const { currentHost } = useAuth()
 
   const navItems = [
-    { path: '/host', icon: <FiHome />, label: 'Dashboard' },
-    { path: '/host/events', icon: <FiCalendar />, label: 'My Events' },
-    { path: '/host/events/create', icon: <FiPlusCircle />, label: 'Create Event' },
-    { path: '/host/guests', icon: <FiUsers />, label: 'Guests' },
-    { path: '#settings', icon: <FiSettings />, label: 'Settings' },
+    { path: '/host/dashboard', icon: <FiHome />, label: 'Dashboard' },
+    { path: '/host/dashboard/register-new-user', icon: <FiPlusCircle />, label: 'Add new user' },
   ]
 
   return (
@@ -58,7 +55,7 @@ function HostSidebar({ open, toggleSidebar }) {
             {/* Host info */}
             <div className="px-4 py-4 border-b border-neutral-200 dark:border-neutral-700">
               <p className="text-xs font-medium text-neutral-500 uppercase tracking-wide dark:text-neutral-400">Host</p>
-              <h2 className="mt-1 text-sm font-medium text-neutral-900 dark:text-white">{currentUser?.name || 'Host'}</h2>
+              <h2 className="mt-1 text-sm font-medium text-neutral-900 dark:text-white">{currentHost?.name || 'Host'}</h2>
             </div>
 
             {/* Navigation */}
@@ -91,15 +88,15 @@ function HostSidebar({ open, toggleSidebar }) {
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <div className="h-8 w-8 rounded-full bg-primary-600 flex items-center justify-center text-white">
-                    {currentUser?.name?.charAt(0) || 'H'}
+                    {currentHost?.name?.charAt(0) || 'H'}
                   </div>
                 </div>
                 <div className="ml-3">
                   <p className="text-sm font-medium text-neutral-800 dark:text-white">
-                    {currentUser?.name || 'Host User'}
+                    { currentHost?.name || 'Host User'}
                   </p>
                   <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                    {currentUser?.email || 'host@example.com'}
+                    { currentHost?.email || 'host@example.com'}
                   </p>
                 </div>
               </div>
