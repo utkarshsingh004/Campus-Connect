@@ -267,6 +267,7 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import ApiResponse from "../utils/apiResponse.js";
 import { Company } from "../models/companies.model.js";
 import CollegeContact from "../models/collegeRegistrationQuery.models.js";
+import nodemailer from 'nodemailer'
 
 // Helper to check if a field is empty
 const isEmpty = (field) =>
@@ -291,11 +292,20 @@ const generateAccessAndRefreshToken = async (userId) => {
   }
 };
 
-// Register user controller
+
+// Create a nodemailer transporter
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.SMTP_EMAIL, // e.g., your Gmail address
+    pass: process.env.SMTP_PASSWORD, // Gmail app password
+  },
+});
+
 const registerUser = asyncHandler(async (req, res) => {
   const { collageName, email, password } = req.body;
 
-  if ([collageName, email, password].some(isEmpty)) {
+  if ([collageName, email, password].some((field) => !field)) {
     throw new ApiError(400, "All fields are required");
   }
 
@@ -304,6 +314,13 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(409, "User with this email already exists");
   }
 
+  // Remove from CollegeContact if exists
+  const collageDatabaseUser = await CollegeContact.findOne({ email });
+  if (collageDatabaseUser) {
+    await collageDatabaseUser.deleteOne();
+  }
+
+  // Create new user
   const user = await User.create({ collageName, email, password });
   const createdUser = await User.findById(user._id).select("-password -refreshToken");
 
@@ -311,10 +328,24 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Error registering user");
   }
 
+  // 📧 Send confirmation email to the newly registered user
+  const info = await transporter.sendMail({
+    from: process.env.SMTP_EMAIL, // sender address
+    to: email, // recipient is the new user's email!
+    subject: "Registration Successful!",
+    text: `Hello ${collageName},\n\nYour registration is successful!\n\nBest regards,\nCampus Connect Team`,
+    html: `<p>Hello <b>${collageName}</b>,</p><p>Your registration is successful!</p><p>Best regards,<br>Campus Connect Team</p>
+    <p>Please change your password.</p>`,
+  });
+
+  console.log("Registration email sent:", info.messageId);
+
   return res.status(201).json(
     new ApiResponse(201, createdUser, "User registered successfully", "success")
   );
 });
+
+
 
 const registerCollege = asyncHandler(async (req, res) => {
   const {
