@@ -28,7 +28,7 @@ function LoginPage() {
         setSuccessMessage('Login successful! Redirecting...');
         setTimeout(() => {
           navigate('/dashboard');
-        }, 1000);
+        }, 500);
       } else {
         setError('Invalid email or password');
       }

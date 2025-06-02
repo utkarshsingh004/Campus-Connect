@@ -92,7 +92,7 @@ function App() {
 
         {/* Host registration page (signup) */}
         <Route
-          path="/signup"
+          path="/register"
           element={
             <HostProtectedRoute isLoggedIn={hostIsLoggedIn}>
               <RegisterPage />

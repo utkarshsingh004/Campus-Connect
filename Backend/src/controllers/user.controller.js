@@ -328,17 +328,40 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Error registering user");
   }
 
-  // 📧 Send confirmation email to the newly registered user
-  const info = await transporter.sendMail({
-    from: process.env.SMTP_EMAIL, // sender address
-    to: email, // recipient is the new user's email!
-    subject: "Registration Successful!",
-    text: `Hello ${collageName},\n\nYour registration is successful!\n\nBest regards,\nCampus Connect Team`,
-    html: `<p>Hello <b>${collageName}</b>,</p><p>Your registration is successful!</p><p>Best regards,<br>Campus Connect Team</p>
-    <p>Please change your password.</p>`,
-  });
+  const logoUrl = "https://example.com/logo.png"; // Replace with your actual logo URL
 
-  console.log("Registration email sent:", info.messageId);
+  // 📧 Email to the new user
+  await transporter.sendMail({
+    from: process.env.SMTP_EMAIL,
+    to: email,
+    subject: "Registration Successful!",
+    html: `
+      <div style="text-align: center;">
+        <img src="${logoUrl}" alt="Campus Connect Logo" style="max-width: 150px; margin-bottom: 20px;" />
+      </div>
+      <p>Hello <b>${collageName}</b>,</p>
+      <p>Your registration is successful!</p>
+       <ul>
+        <li><b>College Name:</b> ${collegeName}</li>
+        <li><b>Email:</b> ${email}</li>
+      </ul>
+      <p>Please change your password by clicking the button below:</p>
+      <p style="text-align: center;">
+        <a href="https://campus-connect-frontend-fufn.onrender.com/"
+           style="
+             display: inline-block;
+             padding: 10px 20px;
+             background-color: #4CAF50;
+             color: #ffffff;
+             text-decoration: none;
+             border-radius: 5px;
+             font-weight: bold;">
+          Change Password
+        </a>
+      </p>
+      <p>Best regards,<br>Campus Connect Team</p>
+    `
+  });
 
   return res.status(201).json(
     new ApiResponse(201, createdUser, "User registered successfully", "success")
@@ -383,6 +406,39 @@ const registerCollege = asyncHandler(async (req, res) => {
   }
 
   const createdCollege = await CollegeContact.findById(college._id).select('-__v');
+
+  const info = await transporter.sendMail({
+    from: email, // new user's email
+    to: process.env.SMTP_EMAIL, // admin/host email
+    subject: "New College Registration Alert",
+    html: `
+     <div style="text-align: center;">
+        <img src="${logoUrl}" alt="Campus Connect Logo" style="max-width: 150px; margin-bottom: 20px;" />
+      </div>
+      <p>Hello Admin,</p>
+      <p>A new college has just registered on Campus Connect:</p>
+      <ul>
+        <li><b>College Name:</b> ${collegeName}</li>
+        <li><b>Email:</b> ${email}</li>
+      </ul>
+      <p>You can view the full details or manage this registration by clicking the button below:</p>
+      <p>
+        <a href="https://campus-connect-frontend-fufn.onrender.com/" 
+           style="
+             display: inline-block;
+             padding: 10px 20px;
+             background-color: #007BFF;
+             color: #ffffff;
+             text-decoration: none;
+             border-radius: 5px;
+             font-weight: bold;">
+          Go to Admin Dashboard
+        </a>
+      </p>
+      <p>Best regards,<br>Campus Connect System</p>
+    `
+  });
+  
 
   return res.status(201).json(
     new ApiResponse(201, createdCollege, "College registered successfully", "success")
