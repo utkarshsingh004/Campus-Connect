@@ -118,6 +118,23 @@ const allNewUsers = asyncHandler(async (req, res) => {
   );
 });
 
+// DELETE /api/v1/host/user/:id
+const deleteUserById = async (req, res) => {
+  const userId = req.params.id;
+
+  try {
+    const deletedUser = await User.findByIdAndDelete(userId);
+
+    if (!deletedUser) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    res.status(200).json({ success: true, message: 'User deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting user:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
 
 
-export { registerHost, loginHost, allUsers, allNewUsers };
+export { registerHost, loginHost, allUsers, allNewUsers, deleteUserById };

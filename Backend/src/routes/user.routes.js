@@ -50,4 +50,5 @@ userRouter.route("/dashboard/companies").get(verifyJWT,companiesDashboard)
 // Secured routes
 userRouter.route("/logout").post(verifyJWT, logoutUser)
 
+
 export default userRouter;

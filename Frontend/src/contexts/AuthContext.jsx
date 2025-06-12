@@ -77,6 +77,28 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const deleteUser = async (userId) => {
+    try {
+      const token = currentHost?.accessToken;
+      if (!token) throw new Error("Host is not authenticated");
+
+      const response = await axios.delete(`${BASE_URL}/api/v1/host/user/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.data?.success) {
+        console.log(`User ${userId} deleted successfully`);
+        return true;
+      } else {
+        console.error('Delete failed:', response.data?.message);
+        return false;
+      }
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      throw error;
+    }
+  };
+
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     const storedHost = localStorage.getItem('host');
@@ -308,6 +330,7 @@ export function AuthProvider({ children }) {
         allUsers,
         fetchNewUsers,
         newUsers,
+        deleteUser, // ✅ Added here
       }}
     >
       {!loading && children}
