@@ -45,7 +45,7 @@ userRouter.route("/dashboard/companies/add").post(verifyJWT, upload.single('logo
 
 userRouter.route("/dashboard/companies").get(verifyJWT,companiesDashboard)
 
-userRouter.route("/dashboard/companies").get(verifyJWT,companiesDashboard)
+// userRouter.route("/dashboard/companies").get(verifyJWT,companiesDashboard)
 
 // Secured routes
 userRouter.route("/logout").post(verifyJWT, logoutUser)

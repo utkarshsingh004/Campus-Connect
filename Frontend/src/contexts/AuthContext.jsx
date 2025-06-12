@@ -15,7 +15,7 @@ export function AuthProvider({ children }) {
 
   const BASE_URL =
     process.env.NODE_ENV === 'production'
-      ? 'https://campus-connect-backend-0u6m.onrender.com'
+      ? ''
       : 'http://localhost:9000';
 
   const fetchCompanies = async (token) => {

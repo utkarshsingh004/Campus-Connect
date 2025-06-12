@@ -269,6 +269,8 @@ import { Company } from "../models/companies.model.js";
 import CollegeContact from "../models/collegeRegistrationQuery.models.js";
 import nodemailer from 'nodemailer'
 
+const logoUrl = "https://sdmntprwestus.oaiusercontent.com/files/00000000-f744-6230-b69c-5401bc522aa9/raw?se=2025-06-05T16%3A07%3A04Z&sp=r&sv=2024-08-04&sr=b&scid=1a1896da-9b7a-5044-b63c-b6cc57d61726&skoid=ea1de0bc-0467-43d6-873a-9a5cf0a9f835&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-06-04T17%3A18%3A56Z&ske=2025-06-05T17%3A18%3A56Z&sks=b&skv=2024-08-04&sig=deGooWrqIALY7Q9gd/JsZw4E1H%2BmZanc0dAQxlGeUK0%3D"; // Replace with your actual logo URL
+
 // Helper to check if a field is empty
 const isEmpty = (field) =>
   field === undefined ||
@@ -328,8 +330,6 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Error registering user");
   }
 
-  const logoUrl = "https://example.com/logo.png"; // Replace with your actual logo URL
-
   // 📧 Email to the new user
   await transporter.sendMail({
     from: process.env.SMTP_EMAIL,
@@ -342,7 +342,7 @@ const registerUser = asyncHandler(async (req, res) => {
       <p>Hello <b>${collageName}</b>,</p>
       <p>Your registration is successful!</p>
        <ul>
-        <li><b>College Name:</b> ${collegeName}</li>
+        <li><b>College Name:</b> ${collageName}</li>
         <li><b>Email:</b> ${email}</li>
       </ul>
       <p>Please change your password by clicking the button below:</p>
@@ -407,7 +407,7 @@ const registerCollege = asyncHandler(async (req, res) => {
 
   const createdCollege = await CollegeContact.findById(college._id).select('-__v');
 
-  const info = await transporter.sendMail({
+    await transporter.sendMail({
     from: email, // new user's email
     to: process.env.SMTP_EMAIL, // admin/host email
     subject: "New College Registration Alert",
