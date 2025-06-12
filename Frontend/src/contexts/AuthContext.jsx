@@ -15,7 +15,7 @@ export function AuthProvider({ children }) {
 
   const BASE_URL =
     process.env.NODE_ENV === 'production'
-      ? ''
+      ? 'https://campus-connect-rkao.onrender.com'
       : 'http://localhost:9000';
 
   const fetchCompanies = async (token) => {
