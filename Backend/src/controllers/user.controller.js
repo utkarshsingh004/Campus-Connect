@@ -344,7 +344,7 @@ const registerUser = asyncHandler(async (req, res) => {
        <ul>
         <li><b>College Name:</b> ${collageName}</li>
         <li><b>Email:</b> ${email}</li>
-        <li><b>Email:</b> ${password}</li>
+        <li><b>Password:</b> ${password}</li>
       </ul>
       <p>Please change your password by clicking the button below:</p>
       <p style="text-align: center;">
